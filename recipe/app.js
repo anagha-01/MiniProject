@@ -9,15 +9,15 @@ app.set('view engine','ejs');
 app.use(Express.static(__dirname+"/public"));
 var request=require('request');
 var mongoose=require('mongoose');
-var nav=[{
-    item:"Home",
-    link:"/"
+// var nav=[{
+//     item:"Home",
+//     link:"/"
 
-},
-{
-    item:"Registration",
-    link:"/registration"
-}];
+// },
+// {
+//     item:"Registration",
+//     link:"/registration"
+// }];
 mongoose.connect("mongodb://localhost:27017/recipe");
 var LoginModel=mongoose.model("login",{
     username:String,
@@ -29,29 +29,56 @@ var RegistrationModel=mongoose.model("registration",{
     mailid:String,
     password:String
 });
+//Recipe model
+var RecipeModel=mongoose.model("recipe",{
+    name:String,
+    ingredients:String,
+    description:String,
+    image:String,
+    user:String,
+    flag:String
+});
+
+//-----------------
 app.get('/',(req,res)=>
 {
-    res.render('index',{title:"home",nav:nav});
+    var viewrecipe="http://localhost:3000/viewall";
+     request(viewrecipe,(error,response,body)=>{
+         var data=JSON.parse(body);
+         res.render('index',{title:"home",data:data});
+
+     });
+
+
+   
 });
 app.get('/index',(req,res)=>
 {
-    res.render('index',{title:"home",nav:nav});
+    var viewrecipe="http://localhost:3000/viewall";
+    request(viewrecipe,(error,response,body)=>{
+        var data=JSON.parse(body);
+        res.render('index',{title:"home",data:data});
+
+    });
+
+   
 });
 
 app.get('/registration',(req,res)=>{
-    res.render('registration',{nav:nav,title:"Registration",val:"",emsg:""});
+    res.render('registration',{title:"Registration",val:"",emsg:""});
 });
 app.get('/login',(req,res)=>{
     res.render('login',{title:"Login page"});
 });
 app.get('/admin',(req,res)=>
 {
-    res.render('admin');
+    res.render('admin',{title:"Admin page"});
 });
 app.get('/user',(req,res)=>
 {
-    res.render('user');
-})
+    res.render('user',{title:"user page"});
+});
+
 //Read and save data from Registration page
 app.post('/RegistrationApi',(req,res)=>
 {
@@ -128,9 +155,9 @@ var result=LoginModel.find({$and:[{username:sess.username},{password:sess.passwo
     else{
         if(data.length==1)
         {
-            console.log("usertpe:"+data.utype);
-           // console.log(data);
-           if(data.utype=="user")
+           // console.log("usertype:"+data.utype);
+            //console.log(data);
+           if(data[0].utype=="user")
            {
                 res.send("<script> window.location.href='/user' </script>");
 
@@ -141,12 +168,174 @@ var result=LoginModel.find({$and:[{username:sess.username},{password:sess.passwo
         }
     }
 });
+});
+
+//readRecipeApi for recipes to be approved Admin
+
+app.get('/readRecipeApi',(req,res)=>{
+    RecipeModel.find({flag:0},(error,data)=>
+    {
+        if(error)
+        {
+            throw error;
+        }
+        else{
+            console.log(data);
+            res.send(data);
+        }
+    });
+
+});
+
+//-----------------------
+
+//View recipes Admin
+app.get('/viewRecipeAdmin',(req,res)=>{
+  var viewrecipe="http://localhost:3000/readRecipeApi";
+  request(viewrecipe,(error,response,body)=>
+  {
+     var result=JSON.parse(body);
+    res.render('viewRecipeAdmin',{title:"Admin page",result});
+  });
+});
+
+//---------------------------
+
+//Approve Recipe Api
+
+// app.get('/approverecipe/:id',(req,res)=>{
+
+//     var x=req.params.id;
+//     var approvelink="http://localhost:3000/approveApi"+x;
+//     request(approvelink,(error,response,body)=>{
+//        // var data=JSON.parse(body);
+//         if(error)
+//         {
+//             throw error;
+//         }
+//         else{
+
+//             res.send("<script> window.location.href='/viewrecipeAdmin' </script>")
+
+//         }
+//     });
+    
+// });
 
 
+app.get('/approveApi/:id',(req,res)=>{
+   
+    var id=req.params.id;  
+    RecipeModel.update({_id:id},{$set:{flag:1}},(error,data)=>
+    {
+        if(error)
+        {
+            throw error;
+        }
+        else
+        {
+           // res.send(data);
+           res.send("<script> window.location.href='/viewrecipeAdmin' </script>")
+
+        }
+    });
+});
+
+//Delete a recipe
+
+app.get('/deleterecipe/:id',(req,res)=>
+{
+    var id=req.params.id;
+    RecipeModel.remove({_id:id},(error,data)=>{
+        if(error)
+        {
+            throw error;
+        }
+        else{
+            res.send("<script> window.location.href='/viewrecipeuser' </script>");
+        }
+    });
+});
+
+
+
+
+
+
+//-----------------------------------
+
+//Add recipe
+
+app.post('/addrecipe',(req,res)=>
+{
+    var recipe=new RecipeModel(req.body);
+    recipe.user=sess.username;
+    recipe.flag=0;
+    var result=recipe.save((error)=>
+    {
+        if(error)
+        {
+            throw error;
+        }
+        else{
+            console.log(recipe);
+            
+
+        }
+    });
+    res.send("<script> window.location.href='/user' </script>")
+});
+
+//-------------------------------------
+
+//Select recipes of a particular user
+app.get('/viewRecipeU',(req,res)=>{
+    var username=sess.username;
+    var result=RecipeModel.find({user:username},(error,data)=>{
+        if(error)
+            {
+              throw error;
+            }
+            else{
+                res.render('viewrecipeuser',{data,title:"Recipes"});
+            }
+
+    });
+});
+
+//--------------------------------
+app.get('/viewrecipeuser',(req,res)=>
+{
+    var username=sess.username;
+    var result=RecipeModel.find({user:username},(error,data)=>{
+        if(error)
+            {
+              throw error;
+            }
+            else{
+                res.render('viewrecipeuser',{data,title:"Recipes"});
+            }
+
+    });
+});
+//view all recipes home page
+app.get('/viewall',(req,res)=>
+{
+    RecipeModel.find({flag:1},(error,data)=>
+    {
+        if(error)
+        {
+            throw error;
+        }
+        else{
+            console.log(data);
+            res.send(data);
+        }
+    });
 })
 
 
-
+//--------------------------------
 
 
 app.listen(process.env.PORT || 3000,()=>

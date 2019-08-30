@@ -42,7 +42,7 @@ var RecipeModel=mongoose.model("recipe",{
 //-----------------
 app.get('/',(req,res)=>
 {
-    var viewrecipe="https://miniproject-recipe.herokuapp.com/viewall";
+    var viewrecipe="http://localhost:3000/viewall";
      request(viewrecipe,(error,response,body)=>{
          var data=JSON.parse(body);
          res.render('index',{title:"home",data:data});
@@ -54,7 +54,7 @@ app.get('/',(req,res)=>
 });
 app.get('/index',(req,res)=>
 {
-    var viewrecipe="https://miniproject-recipe.herokuapp.com/viewall";
+    var viewrecipe="http://localhost:3000/viewall";
     request(viewrecipe,(error,response,body)=>{
         var data=JSON.parse(body);
         res.render('index',{title:"home",data:data});

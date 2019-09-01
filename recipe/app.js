@@ -119,7 +119,8 @@ var result=regdata.save((error)=>
        console.log("Mailid"+regdata.mailid);
    }
 });
- res.send("<script> window.location.href='/registration' </script>");
+ //res.send("<script> window.location.href='/registration' </script>");
+ res.send("<script> window.location.href='https://mini-project-recipe.herokuapp.com/registration' </script>");
 });
 
 //---------------------------------------------------------------------
@@ -162,11 +163,14 @@ var result=LoginModel.find({$and:[{username:sess.username},{password:sess.passwo
             //console.log(data);
            if(data[0].utype=="user")
            {
-                res.send("<script> window.location.href='/user' </script>");
+              //  res.send("<script> window.location.href='/user' </script>");
+              res.send("<script> window.location.href='https://mini-project-recipe.herokuapp.com/user' </script>");
+
 
            }
            else{
-            res.send("<script> window.location.href='/admin' </script>");
+         //   res.send("<script> window.location.href='/admin' </script>");
+         res.send("<script> window.location.href='https://mini-project-recipe.herokuapp.com/admin' </script>");
            }
         }
     }
@@ -239,8 +243,9 @@ app.get('/approveApi/:id',(req,res)=>{
         }
         else
         {
-           // res.send(data);
-           res.send("<script> window.location.href='/viewrecipeAdmin' </script>")
+           
+         //  res.send("<script> window.location.href='/viewrecipeAdmin' </script>")
+         res.send("<script> window.location.href='https://mini-project-recipe.herokuapp.com/viewrecipeAdmin' </script>")
 
         }
     });
@@ -257,7 +262,8 @@ app.get('/deleterecipe/:id',(req,res)=>
             throw error;
         }
         else{
-            res.send("<script> window.location.href='/viewrecipeuser' </script>");
+           // res.send("<script> window.location.href='/viewrecipeuser' </script>");
+           res.send("<script> window.location.href='https://mini-project-recipe.herokuapp.com/viewrecipeuser' </script>");
         }
     });
 });
@@ -288,7 +294,8 @@ app.post('/addrecipe',(req,res)=>
 
         }
     });
-    res.send("<script> window.location.href='/user' </script>")
+   // res.send("<script> window.location.href='/user' </script>")
+   res.send("<script> window.location.href='https://mini-project-recipe.herokuapp.com/user' </script>")
 });
 
 //-------------------------------------

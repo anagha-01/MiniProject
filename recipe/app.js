@@ -18,7 +18,8 @@ var mongoose=require('mongoose');
 //     item:"Registration",
 //     link:"/registration"
 // }];
-mongoose.connect("mongodb://localhost:27017/recipe");
+// mongoose.connect("mongodb://localhost:27017/recipe");
+mongoose.connect("mongodb+srv://mongodb:mongodb@mycluster-rfooj.mongodb.net/test?retryWrites=true&w=majority/recipe");
 var LoginModel=mongoose.model("login",{
     username:String,
     password:String,
@@ -42,7 +43,8 @@ var RecipeModel=mongoose.model("recipe",{
 //-----------------
 app.get('/',(req,res)=>
 {
-    var viewrecipe="http://localhost:3000/viewall";
+   // var viewrecipe="http://localhost:3000/viewall";
+   var viewrecipe="https://dashboard.heroku.com/apps/mini-project-recipe/viewall";
      request(viewrecipe,(error,response,body)=>{
          var data=JSON.parse(body);
          res.render('index',{title:"home",data:data});
@@ -54,7 +56,8 @@ app.get('/',(req,res)=>
 });
 app.get('/index',(req,res)=>
 {
-    var viewrecipe="http://localhost:3000/viewall";
+  //  var viewrecipe="http://localhost:3000/viewall";
+  var viewrecipe="https://dashboard.heroku.com/apps/mini-project-recipe/viewall";
     request(viewrecipe,(error,response,body)=>{
         var data=JSON.parse(body);
         res.render('index',{title:"home",data:data});
@@ -191,7 +194,9 @@ app.get('/readRecipeApi',(req,res)=>{
 
 //View recipes Admin
 app.get('/viewRecipeAdmin',(req,res)=>{
-  var viewrecipe="http://localhost:3000/readRecipeApi";
+
+  // var viewrecipe="http://localhost:3000/readRecipeApi";
+  var viewrecipe="https://dashboard.heroku.com/apps/mini-project-recipe/readRecipeApi";
   request(viewrecipe,(error,response,body)=>
   {
      var result=JSON.parse(body);
